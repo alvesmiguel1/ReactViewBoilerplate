@@ -31,7 +31,6 @@
     <PackageReference Include="Avalonia.Diagnostics" />
     <PackageReference Include="Avalonia.ReactiveUI" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
-    <PackageReference Include="NLog" />
     <PackageReference Include="ReactViewControl-Avalonia$(ReactViewPackageSuffix)" />
     <PackageReference Include="ViewGenerator">
       <PrivateAssets>all</PrivateAssets>
@@ -45,14 +44,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="tsconfig.json">
-      <Visible>True</Visible>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="ts2lang.json">
       <Visible>True</Visible>
     </None>
+    <Content Update="tsconfig.json">
+      <Visible>True</Visible>
+    </Content>
+    <EmbeddedResource Include="MainView\Tasks.png" />
+    <EmbeddedResource Include="Users\User1.png" />
+    <EmbeddedResource Include="Users\User2.png" />
   </ItemGroup>
 </Project>
