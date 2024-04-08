@@ -396,3 +396,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Misc generated files
+**/.DS_STore
+**/Generated/**/*
+**/.npm-install-stamp
+**/manifest.json
+**/global.d.ts
+**/.idea/**/*

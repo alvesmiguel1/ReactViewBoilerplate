@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup>
+    <DotnetVersion>net6.0</DotnetVersion>
+    <Platforms>x64;ARM64</Platforms>
+    
+    <!-- File with mtime of last successful npm install -->
+    <NpmInstallStampFile>.npm-install-stamp</NpmInstallStampFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AvaloniaVersion>11.0.10</AvaloniaVersion>
+    <WebViewVersion>2.121.101</WebViewVersion>
+    <ReactViewVersion>2.120.102</ReactViewVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)' == '' or '$(Platform)' == 'x64'">
+    <PackageSuffix />
+    <WebViewPackageSuffix />
+    <ReactViewPackageSuffix />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)' == 'ARM64'">
+    <PackageSuffix>-ARM64</PackageSuffix>
+    <WebViewPackageSuffix>-ARM64</WebViewPackageSuffix>
+    <ReactViewPackageSuffix>-ARM64</ReactViewPackageSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageJsons Include="**/package.json" Exclude="**/node_modules/**/*.*"/>
+  </ItemGroup>
+</Project>
