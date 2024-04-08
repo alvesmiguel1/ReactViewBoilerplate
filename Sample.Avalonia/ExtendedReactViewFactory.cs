@@ -10,6 +10,11 @@ namespace Sample.Avalonia {
             public override ResourceUrl DefaultStyleSheet =>
                 new(typeof(ExtendedReactViewFactory).Assembly, "Generated",
                     Settings.IsLightTheme ? "LightTheme.css" : "DarkTheme.css");
+            
+            public override IViewModule[] InitializePlugins() {
+                var viewPlugin = new ViewPlugin();
+                return new IViewModule[] { viewPlugin };
+            }
 
             public override bool ShowDeveloperTools => false;
 
