@@ -1,3 +1,7 @@
 # ReactViewBoilerplate
 
-This is a boilerplate of a CefGlue application using Avalonia.
+This is a sample boilerplate of a CefGlue application using Avalonia 11.
+
+## Build Requirements
+- Node (latest version)
+- .NET 6
