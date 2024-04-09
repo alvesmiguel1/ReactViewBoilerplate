@@ -6,6 +6,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Primitives.PopupPositioning;
+using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using ReactViewControl;
 using WebViewControl;
@@ -56,27 +59,29 @@ namespace Sample.Avalonia {
         
         private void OnShowTooltip(double x, double y) {
             lock (tooltipLock) {
-                var toolTip = new ToolTip { Content = "This is a tooltip, welcome." };
                 
-                ToolTip.SetPlacement(this, PlacementMode.Pointer);
-                ToolTip.SetHorizontalOffset(this, 0);
-                ToolTip.SetVerticalOffset(this, 10);
+                var popup = new Popup
+                {
+                    Child = new ContentControl { Content = "Test tooltip" },
+                    PlacementTarget = this,
+                    Placement = PlacementMode.Pointer,
+                    PlacementAnchor = PopupAnchor.TopLeft,
+                    PlacementGravity = PopupGravity.BottomRight,
+                    PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.All,
+                    IsLightDismissEnabled = true,
+                };
                 
-                ToolTip.SetTip(this, toolTip);
-                ToolTip.SetIsOpen(this, true);
-                tooltipTargets.Push(this);
-                
-                
-                
-                if (toolTip is not IPopupHostProvider { PopupHost: not null } popupHostProvider) {
-                    return;
-                }
-                
-                if (popupHostProvider.PopupHost is not PopupRoot popupRoot) {
-                    return;
-                }
-                
-                popupRoot.WindowManagerAddShadowHint = true;
+                var content = (ContentControl)popup.Child;
+                content.Padding = new Thickness(4);
+                content.CornerRadius = new CornerRadius(4);
+                content.Margin = new Thickness(4, 0, 4, 4); // so we can have some space for shadow
+                content.Background = ActualThemeVariant == ThemeVariant.Dark ? Brushes.Black : Brushes.White;
+                content.Effect = new DropShadowEffect { BlurRadius = 3, Color = new Color(100, 0, 0, 0) };
+
+                ((ISetLogicalParent)popup).SetParent(this);
+                popup.Open();
+
+                tooltipTargets.Push(popup);
             }
         }
         
@@ -84,7 +89,8 @@ namespace Sample.Avalonia {
             lock (tooltipLock) {
                 Dispatcher.UIThread.Invoke(() => {
                     foreach (var t in tooltipTargets) {
-                        ToolTip.SetTip(t, null);
+                        ((Popup)t).Close();
+                        //ToolTip.SetTip(t, null);
                     }
                     tooltipTargets.Clear();
                 });
