@@ -57,17 +57,16 @@ namespace Sample.Avalonia {
         private void OnShowTooltip(double x, double y) {
             lock (tooltipLock) {
                 var toolTip = new ToolTip { Content = "This is a tooltip, welcome." };
-
+                
+                ToolTip.SetPlacement(this, PlacementMode.Pointer);
+                ToolTip.SetHorizontalOffset(this, 0);
+                ToolTip.SetVerticalOffset(this, 10);
+                
                 ToolTip.SetTip(this, toolTip);
                 ToolTip.SetIsOpen(this, true);
                 tooltipTargets.Push(this);
                 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-                    // var offset = new Point(x, y + 10);
-                    // ToolTip.SetPlacement(this, PlacementMode.Pointer);
-                    // ToolTip.SetHorizontalOffset(this, offset.X);
-                    // ToolTip.SetVerticalOffset(this, offset.Y);
-                }
+                
                 
                 if (toolTip is not IPopupHostProvider { PopupHost: not null } popupHostProvider) {
                     return;
