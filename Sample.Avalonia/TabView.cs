@@ -60,16 +60,27 @@ namespace Sample.Avalonia {
         private void OnShowTooltip(double x, double y) {
             lock (tooltipLock) {
                 Dispatcher.UIThread.Invoke(() => {
-
                     var popup = new Popup {
                         Child = new ContentControl { Content = "Test tooltip" },
                         PlacementTarget = this,
-                        Placement = PlacementMode.Pointer,
-                        PlacementAnchor = PopupAnchor.TopLeft,
-                        PlacementGravity = PopupGravity.BottomRight,
-                        PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.All,
                         IsLightDismissEnabled = true,
                     };
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                        popup.Placement = PlacementMode.AnchorAndGravity;
+                        popup.PlacementAnchor = PopupAnchor.TopLeft;
+                        popup.PlacementGravity = PopupGravity.BottomRight;
+                        popup.HorizontalOffset = x;
+                        popup.VerticalOffset = y + 10;
+                        popup.PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX
+                            | PopupPositionerConstraintAdjustment.FlipY
+                            | PopupPositionerConstraintAdjustment.ResizeX
+                            | PopupPositionerConstraintAdjustment.ResizeY;
+                    } else {
+                        popup.Placement = PlacementMode.Pointer;
+                        popup.HorizontalOffset = 0;
+                        popup.VerticalOffset = 10;
+                    }
 
                     var content = (ContentControl)popup.Child;
                     content.Padding = new Thickness(4);
