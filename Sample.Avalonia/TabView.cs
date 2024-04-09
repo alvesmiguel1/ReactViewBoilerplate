@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Diagnostics;
+using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
 using ReactViewControl;
 using WebViewControl;
@@ -52,10 +56,28 @@ namespace Sample.Avalonia {
         
         private void OnShowTooltip(double x, double y) {
             lock (tooltipLock) {
-                var toolTip = new ToolTip() { Content = "testing tooltip" };
+                var toolTip = new ToolTip { Content = "This is a tooltip, welcome." };
+
                 ToolTip.SetTip(this, toolTip);
                 ToolTip.SetIsOpen(this, true);
                 tooltipTargets.Push(this);
+                
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                    // var offset = new Point(x, y + 10);
+                    // ToolTip.SetPlacement(this, PlacementMode.Pointer);
+                    // ToolTip.SetHorizontalOffset(this, offset.X);
+                    // ToolTip.SetVerticalOffset(this, offset.Y);
+                }
+                
+                if (toolTip is not IPopupHostProvider { PopupHost: not null } popupHostProvider) {
+                    return;
+                }
+                
+                if (popupHostProvider.PopupHost is not PopupRoot popupRoot) {
+                    return;
+                }
+                
+                popupRoot.WindowManagerAddShadowHint = true;
             }
         }
         
