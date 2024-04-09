@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>11.0.10</AvaloniaVersion>
+    <AvaloniaVersion>11.2.999-cibuild0046961-alpha</AvaloniaVersion>
     <WebViewVersion>2.121.101</WebViewVersion>
     <ReactViewVersion>2.120.102</ReactViewVersion>
   </PropertyGroup>

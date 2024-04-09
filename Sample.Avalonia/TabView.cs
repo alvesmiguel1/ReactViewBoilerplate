@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -31,7 +32,9 @@ namespace Sample.Avalonia {
             mainView.GetTasksCount += () => taskList.Count;
             mainView.TaskListShown += () => taskListView.Load();
             mainView.WithPlugin<ViewPlugin>().NotifyViewLoaded += viewName => AppendLog(viewName + " loaded");
-
+            mainView.WithPlugin<ViewPlugin>().ShowTooltip += OnShowTooltip;
+            mainView.WithPlugin<ViewPlugin>().HideTooltip += OnHideTooltip;
+            
             taskListView = (TaskListViewModule)mainView.ListView;
             taskListView.GetTasks += () => taskList.ToArray();
 
@@ -42,6 +45,29 @@ namespace Sample.Avalonia {
             taskListView.Load();
 
             Content = mainView;
+        }
+
+        private readonly object tooltipLock = new();
+        private readonly ConcurrentStack<Control> tooltipTargets = new();
+        
+        private void OnShowTooltip(double x, double y) {
+            lock (tooltipLock) {
+                var toolTip = new ToolTip() { Content = "testing tooltip" };
+                ToolTip.SetTip(this, toolTip);
+                ToolTip.SetIsOpen(this, true);
+                tooltipTargets.Push(this);
+            }
+        }
+        
+        private void OnHideTooltip() {
+            lock (tooltipLock) {
+                Dispatcher.UIThread.Invoke(() => {
+                    foreach (var t in tooltipTargets) {
+                        ToolTip.SetTip(t, null);
+                    }
+                    tooltipTargets.Clear();
+                });
+            }
         }
 
         private void OnMainViewAddTaskButtonClicked(TaskCreationDetails taskDetails) {

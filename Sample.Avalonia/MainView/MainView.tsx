@@ -118,12 +118,20 @@ export default class MainView extends React.Component<IMainViewProperties, MainV
         }
     }
 
+    private handleMouseOver = (event: React.MouseEvent<HTMLButtonElement>) => {
+        this.viewplugin.showTooltip(event.clientX, event.clientY);
+    };
+
+    private handleMouseLeave = (event: React.MouseEvent<HTMLButtonElement>) => {
+        this.viewplugin.hideTooltip();
+    };
+
     public render(): JSX.Element {
         return (
             <div className="wrapper">
                 <div className="title">{this.props.titleMessage}</div>
                 <input className="task-input" ref={this.inputRef} onChange={() => this.props.inputChanged()} />
-                <button className="task-add" onClick={this.onAddTaskButtonClicked}>Add Task</button>
+                <button className="task-add" onClick={this.onAddTaskButtonClicked} onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave}>Add Task</button>
                 <button className="tasks-toggle-show" onClick={this.toggleShowTasks}>Show/Block/Hide Tasks</button>
                 {this.renderListView()}
                 <div>{this.state.tasksCount} task(s)</div>
