@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Threading;
 using ReactViewControl;
 using WebViewControl;
@@ -56,27 +57,42 @@ namespace Sample.Avalonia {
         
         private void OnShowTooltip(double x, double y) {
             lock (tooltipLock) {
-                var toolTip = new ToolTip { Content = "This is a tooltip, welcome." };
-                
-                ToolTip.SetPlacement(this, PlacementMode.Pointer);
-                ToolTip.SetHorizontalOffset(this, 0);
-                ToolTip.SetVerticalOffset(this, 10);
-                
-                ToolTip.SetTip(this, toolTip);
-                ToolTip.SetIsOpen(this, true);
-                tooltipTargets.Push(this);
-                
-                
-                
-                if (toolTip is not IPopupHostProvider { PopupHost: not null } popupHostProvider) {
-                    return;
-                }
-                
-                if (popupHostProvider.PopupHost is not PopupRoot popupRoot) {
-                    return;
-                }
-                
-                popupRoot.WindowManagerAddShadowHint = true;
+                Dispatcher.UIThread.Invoke(() => {
+                    var toolTip = new ToolTip { Content = "This is a tooltip, welcome." };
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                        ToolTip.SetPlacement(this, PlacementMode.AnchorAndGravity);
+                        //ToolTip.SetHorizontalOffset(this, 0);
+                        //ToolTip.SetVerticalOffset(this, 0);
+                    }
+            
+
+                    ToolTip.SetTip(this, toolTip);
+                    ToolTip.SetIsOpen(this, true);
+                    tooltipTargets.Push(this);
+
+                    if (toolTip is not IPopupHostProvider { PopupHost: not null } popupHostProvider) {
+                        return;
+                    }
+
+                    if (popupHostProvider.PopupHost is not PopupRoot popupRoot) {
+                        return;
+                    }
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                        popupHostProvider.PopupHost.ConfigurePosition(
+                            this,
+                            PlacementMode.AnchorAndGravity,
+                            new Point(x, y + 10),
+                            PopupAnchor.TopLeft,
+                            PopupGravity.BottomRight,
+                            PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY | PopupPositionerConstraintAdjustment.SlideX | PopupPositionerConstraintAdjustment.SlideY | PopupPositionerConstraintAdjustment.ResizeX | PopupPositionerConstraintAdjustment.ResizeY
+                        );
+                    }
+
+                    popupRoot.WindowManagerAddShadowHint = true;
+
+                });
             }
         }
         
