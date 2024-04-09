@@ -59,29 +59,30 @@ namespace Sample.Avalonia {
         
         private void OnShowTooltip(double x, double y) {
             lock (tooltipLock) {
-                
-                var popup = new Popup
-                {
-                    Child = new ContentControl { Content = "Test tooltip" },
-                    PlacementTarget = this,
-                    Placement = PlacementMode.Pointer,
-                    PlacementAnchor = PopupAnchor.TopLeft,
-                    PlacementGravity = PopupGravity.BottomRight,
-                    PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.All,
-                    IsLightDismissEnabled = true,
-                };
-                
-                var content = (ContentControl)popup.Child;
-                content.Padding = new Thickness(4);
-                content.CornerRadius = new CornerRadius(4);
-                content.Margin = new Thickness(4, 0, 4, 4); // so we can have some space for shadow
-                content.Background = ActualThemeVariant == ThemeVariant.Dark ? Brushes.Black : Brushes.White;
-                content.Effect = new DropShadowEffect { BlurRadius = 3, Color = new Color(100, 0, 0, 0) };
+                Dispatcher.UIThread.Invoke(() => {
 
-                ((ISetLogicalParent)popup).SetParent(this);
-                popup.Open();
+                    var popup = new Popup {
+                        Child = new ContentControl { Content = "Test tooltip" },
+                        PlacementTarget = this,
+                        Placement = PlacementMode.Pointer,
+                        PlacementAnchor = PopupAnchor.TopLeft,
+                        PlacementGravity = PopupGravity.BottomRight,
+                        PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.All,
+                        IsLightDismissEnabled = true,
+                    };
 
-                tooltipTargets.Push(popup);
+                    var content = (ContentControl)popup.Child;
+                    content.Padding = new Thickness(4);
+                    content.CornerRadius = new CornerRadius(4);
+                    content.Margin = new Thickness(4, 0, 4, 4); // so we can have some space for shadow
+                    content.Background = ActualThemeVariant == ThemeVariant.Dark ? Brushes.Black : Brushes.White;
+                    content.Effect = new DropShadowEffect { BlurRadius = 3, Color = new Color(100, 0, 0, 0) };
+
+                    ((ISetLogicalParent)popup).SetParent(this);
+                    popup.Open();
+
+                    tooltipTargets.Push(popup);
+                });
             }
         }
         
