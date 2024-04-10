@@ -10,6 +10,7 @@ using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using ReactViewControl;
 using WebViewControl;
 
@@ -71,11 +72,15 @@ namespace Sample.Avalonia {
                         popup.PlacementAnchor = PopupAnchor.TopLeft;
                         popup.PlacementGravity = PopupGravity.BottomRight;
                         popup.HorizontalOffset = x;
-                        popup.VerticalOffset = y + 10;
-                        popup.PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX
-                            | PopupPositionerConstraintAdjustment.FlipY
-                            | PopupPositionerConstraintAdjustment.ResizeX
-                            | PopupPositionerConstraintAdjustment.ResizeY;
+                        popup.VerticalOffset = y;
+                        popup.PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY;
+
+                        if (this.GetVisualRoot() is not Window window) {
+                            return;
+                        }
+                        var activeScreen = window.Screens.ScreenFromBounds(new PixelRect((int)(window.Position.X + x), (int)(window.Position.Y + y), 1, 1));
+                        popup.PlacementRect = activeScreen.Bounds.ToRect(activeScreen.Scaling);
+
                     } else {
                         popup.Placement = PlacementMode.Pointer;
                         popup.HorizontalOffset = 0;
@@ -96,7 +101,7 @@ namespace Sample.Avalonia {
                 });
             }
         }
-        
+
         private void OnHideTooltip() {
             lock (tooltipLock) {
                 Dispatcher.UIThread.Invoke(() => {
