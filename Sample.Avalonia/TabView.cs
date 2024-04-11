@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Diagnostics;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Media;
-using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ReactViewControl;
@@ -17,7 +15,17 @@ using WebViewControl;
 namespace Sample.Avalonia {
 
     internal class TabView : ContentControl {
-
+        private const int BorderThickness = 1;
+        private const int CornerRadiusOSX = 9;
+        private const int CornerRadiusWindows = 8;
+        private const int DropShadowBlurRadius = 20;
+        private const int DropShadowDepth = 20;
+        private const int DropShadowDirection = 5;
+        private const double DropShadowOpacity = 0.2;
+        private const int MarginThickness = 10;
+        private const int Padding = 2;
+        private const int VerticalDistanceFromPointer = 10;
+        
         protected override Type StyleKeyOverride => typeof(ContentControl);
 
         private MainView mainView;
@@ -59,72 +67,50 @@ namespace Sample.Avalonia {
         private readonly ConcurrentStack<Control> tooltipTargets = new();
         
         private void OnShowTooltip(double x, double y) {
-    lock (tooltipLock) {
-        Dispatcher.UIThread.Invoke(() => {
+            lock (tooltipLock) {
+                Dispatcher.UIThread.Invoke(() => {
 
-            var popup = new Popup {
-                Child = new ContentControl { Content = "Test tooltip" },
-                PlacementTarget = this,
-                Placement = PlacementMode.AnchorAndGravity,
-                PlacementAnchor = PopupAnchor.TopLeft,
-                PlacementGravity = PopupGravity.BottomRight,
-                HorizontalOffset = x,
-                VerticalOffset = y,
-                PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX  |PopupPositionerConstraintAdjustment.FlipY,
-                IsLightDismissEnabled = true,
-                
-            };
+                    var tooltipView = new TooltipView();
+                    tooltipView.Width = 125;
+                    tooltipView.Height = 18;
+                    tooltipView.GetTooltip += () => "refreshed tooltip";
+                    tooltipView.RefreshTooltip();
+                    
+                    var tooltip = new Popup {
+                        Child = new ContentControl { Content = tooltipView },
+                        Focusable = false,
+                        HorizontalOffset = x,
+                        Placement = PlacementMode.AnchorAndGravity,
+                        PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY,
+                        PlacementGravity = PopupGravity.BottomRight,
+                        PlacementAnchor = PopupAnchor.TopLeft,
+                        PlacementRect = MeasurePlacementRect(this.GetVisualRoot() as Window, this, x, y),
+                        PlacementTarget = this,
+                        VerticalOffset = y + VerticalDistanceFromPointer,
+                        WindowManagerAddShadowHint = false
+                    };
+                    
+                    var content = (ContentControl)tooltip.Child;
+                    content.Margin = new Thickness(MarginThickness);
+                    content.Padding = new Thickness(Padding);
+                    content.CornerRadius = new CornerRadius(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? CornerRadiusWindows : CornerRadiusOSX);
+                    content.Background = new SolidColorBrush(Color.Parse("#2C2F32"));
+                    content.BorderBrush = new SolidColorBrush(Color.Parse("#3B3D41"));
+                    content.BorderThickness = new Thickness(BorderThickness);
+                    content.Effect = new DropShadowDirectionEffect {
+                        ShadowDepth = DropShadowDepth, 
+                        BlurRadius = DropShadowBlurRadius, 
+                        Opacity = DropShadowOpacity, 
+                        Color = Color.Parse("#2C2F32"), 
+                        Direction = DropShadowDirection
+                    };
 
-            var window = this.GetVisualRoot() as Window;
-            var scale = window.RenderScaling;
-
-            // Calculate the scaled window bounds
-            var scaledWindowBounds = new PixelRect(
-                (int)(window.Position.X * scale),
-                (int)(window.Position.Y * scale),
-                (int)(window.Bounds.Width * scale),
-                (int)(window.Bounds.Height * scale)
-            );
-
-            var browserPosition = mainView.PointToScreen(new Point(mainView.Bounds.Position.X, mainView.Bounds.Position.Y));
-
-            var browserBounds = new PixelRect(
-                (int)(browserPosition.X),
-                (int)(browserPosition.Y),
-                (int)(mainView.Bounds.Width * scale),
-                (int)(mainView.Bounds.Height * scale)
-            );
-
-            // Calculate the scaled position of the cursor within the BROWSER
-            var scaledCursorX = (int)(x * scale);
-            var scaledCursorY = (int)(y * scale);
-
-            var deltaX = Math.Abs(browserBounds.Position.X - window.Position.X);
-            var deltaY = Math.Abs(browserBounds.Position.Y - window.Position.Y);
-
-            var activeScreen = window.Screens.ScreenFromBounds(new PixelRect(window.Position.X + deltaX + scaledCursorX, window.Position.Y + deltaY + scaledCursorY, 1, 1));
-            if (activeScreen == null) {
-                return;
+                    ((ISetLogicalParent)tooltip).SetParent(this.GetVisualRoot() as Window);
+                    tooltip.Open();
+                    tooltipTargets.Push(tooltip);
+                });
             }
-
-            var intersection = scaledWindowBounds.Intersect(activeScreen.Bounds);
-
-            popup.PlacementRect = intersection.ToRectWithDpi(scale);
-
-            var content = (ContentControl)popup.Child;
-            content.Padding = new Thickness(4);
-            content.CornerRadius = new CornerRadius(4);
-            content.Margin = new Thickness(4, 0, 4, 4); // so we can have some space for shadow
-            content.Background = ActualThemeVariant == ThemeVariant.Dark ? Brushes.Black : Brushes.White;
-            content.Effect = new DropShadowEffect { BlurRadius = 3, Color = new Color(100, 0, 0, 0) };
-
-            ((ISetLogicalParent)popup).SetParent(this);
-            popup.Open();
-
-            tooltipTargets.Push(popup);
-        });
-    }
-}
+        }
 
         private void OnHideTooltip() {
             lock (tooltipLock) {
@@ -166,6 +152,27 @@ namespace Sample.Avalonia {
 
         private Resource OnTaskListViewCustomResourceRequested(string resourceKey, params string[] options) {
             return new Resource(ResourcesManager.GetResource(GetType().Assembly, new[] { "Users", resourceKey + ".png" }));
+        }
+        
+        private static Rect MeasurePlacementRect(Window window, Visual target, double x, double y) {
+            var renderScaling = window.RenderScaling;
+                    
+            // Calculate scaled window bounds
+            var scaledWindowBounds = new PixelRect(
+                x: (int)(window.Position.X * renderScaling),
+                y: (int)(window.Position.Y * renderScaling),
+                width: (int)(window.Bounds.Width * renderScaling),
+                height: (int)(window.Bounds.Height * renderScaling)
+            );
+                    
+            var controlPosition = target.PointToScreen(new Point(target.Bounds.Position.X, target.Bounds.Position.Y));
+                    
+            // Calculate the scaled position of the cursor within the browser
+            var scaledCursorX = (int)(x * renderScaling);
+            var scaledCursorY = (int)(y * renderScaling);
+                    
+            var activeScreen = window.Screens.ScreenFromBounds(new PixelRect(controlPosition.X + scaledCursorX, controlPosition.Y + scaledCursorY, 1, 1));
+            return activeScreen == null ? default : scaledWindowBounds.Intersect(activeScreen.Bounds).ToRectWithDpi(renderScaling);
         }
     }
 }
