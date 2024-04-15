@@ -39,8 +39,8 @@ namespace Sample.Avalonia {
                     popupView.GetPopupData += () => "Hello, this is a popup, write some things:";
                     popupView.OnBtnClick += OnHideTooltip;
                     popupView.RefreshPopup();
-                    popupView.Width = 500;
-                    popupView.Height = 500;
+                    popupView.Width = 200;
+                    popupView.Height = 200;
                     
                     var popup = new Popup {
                         Child = new ContentControl { Content = popupView },
@@ -62,6 +62,7 @@ namespace Sample.Avalonia {
                     content.Margin = new Thickness(MarginThickness);
                     content.Padding = new Thickness(Padding);
                     content.BorderThickness = new Thickness(BorderThickness);
+                    content.BorderBrush = new SolidColorBrush(Colors.Black);
 
                     ((ISetLogicalParent)popup).SetParent(this.GetVisualRoot() as Window);
                     targets.Push(popup);
