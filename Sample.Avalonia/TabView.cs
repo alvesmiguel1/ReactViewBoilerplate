@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -9,8 +8,6 @@ using Avalonia.Controls.Primitives.PopupPositioning;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using ReactViewControl;
-using WebViewControl;
 
 namespace Sample.Avalonia {
 
@@ -24,135 +21,78 @@ namespace Sample.Avalonia {
         private const double DropShadowOpacity = 0.2;
         private const int MarginThickness = 10;
         private const int Padding = 2;
-        private const int VerticalDistanceFromPointer = 10;
         
         protected override Type StyleKeyOverride => typeof(ContentControl);
 
         private MainView mainView;
-        private TaskListViewModule taskListView;
         private int taskCounter;
 
-        private readonly List<Task> taskList = new() {
-            new() { id = 0, text = "Learn react.js", isCompleted = true, user = "User1" },
-            new() { id = 1, text = "Explore the ReactView framework", user = "User2" }
-        };
-
         public TabView(int id) {
-            taskCounter = taskList.Count;
-
             mainView = new MainView();
             mainView.Focusable = true;
-            mainView.TitleMessage = "Tasks List (" + id + ")";
-            mainView.BackgroundKind = BackgroundKind.Image;
-            mainView.AddTaskButtonClicked += OnMainViewAddTaskButtonClicked;
-            mainView.GetTasksCount += () => taskList.Count;
-            mainView.TaskListShown += () => taskListView.Load();
-            mainView.WithPlugin<ViewPlugin>().NotifyViewLoaded += viewName => AppendLog(viewName + " loaded");
-            mainView.WithPlugin<ViewPlugin>().ShowTooltip += OnShowTooltip;
-            mainView.WithPlugin<ViewPlugin>().HideTooltip += OnHideTooltip;
-            
-            taskListView = (TaskListViewModule)mainView.ListView;
-            taskListView.GetTasks += () => taskList.ToArray();
-
-            // this is an example of dynamic resources support
-            taskListView.CustomResourceRequested += OnTaskListViewCustomResourceRequested;
-
-            taskListView.WithPlugin<ViewPlugin>().NotifyViewLoaded += (viewName) => AppendLog(viewName + " loaded (child)");
-            taskListView.Load();
+            mainView.OnBtnClick += OnShowPopup;
 
             Content = mainView;
         }
 
-        private readonly object tooltipLock = new();
-        private readonly ConcurrentStack<Control> tooltipTargets = new();
+        private readonly object popupLock = new();
+        private readonly ConcurrentStack<Control> targets = new();
         
-        private void OnShowTooltip(double x, double y) {
-            lock (tooltipLock) {
+        private void OnShowPopup() {
+            lock (popupLock) {
                 Dispatcher.UIThread.Invoke(() => {
 
-                    var tooltipView = new TooltipView();
-                    tooltipView.Width = 125;
-                    tooltipView.Height = 18;
-                    tooltipView.GetTooltip += () => "refreshed tooltip";
-                    tooltipView.RefreshTooltip();
+                    var popupView = new PopupView();
+                    popupView.GetPopupData += () => "Hello, this is a popup, write some things:";
+                    popupView.OnBtnClick += OnHideTooltip;
+                    popupView.RefreshPopup();
+                    popupView.Width = 500;
+                    popupView.Height = 500;
                     
-                    var tooltip = new Popup {
-                        Child = new ContentControl { Content = tooltipView },
-                        Focusable = false,
-                        HorizontalOffset = x,
+                    var popup = new Popup {
+                        Child = new ContentControl { Content = popupView },
+                        Focusable = true,
+                        IsEnabled = true,
+                        HorizontalOffset = 100,
                         Placement = PlacementMode.AnchorAndGravity,
                         PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY,
                         PlacementGravity = PopupGravity.BottomRight,
                         PlacementAnchor = PopupAnchor.TopLeft,
-                        PlacementRect = MeasurePlacementRect(this.GetVisualRoot() as Window, this, x, y),
+                        PlacementRect = MeasurePlacementRect(this.GetVisualRoot() as Window, this, 100, 100),
                         PlacementTarget = this,
-                        VerticalOffset = y + VerticalDistanceFromPointer,
+                        VerticalOffset = 100,
                         WindowManagerAddShadowHint = false
                     };
-                    
-                    var content = (ContentControl)tooltip.Child;
+
+
+                    var content = (ContentControl)popup.Child;
                     content.Margin = new Thickness(MarginThickness);
                     content.Padding = new Thickness(Padding);
-                    content.CornerRadius = new CornerRadius(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? CornerRadiusWindows : CornerRadiusOSX);
-                    content.Background = new SolidColorBrush(Color.Parse("#2C2F32"));
-                    content.BorderBrush = new SolidColorBrush(Color.Parse("#3B3D41"));
                     content.BorderThickness = new Thickness(BorderThickness);
-                    content.Effect = new DropShadowDirectionEffect {
-                        ShadowDepth = DropShadowDepth, 
-                        BlurRadius = DropShadowBlurRadius, 
-                        Opacity = DropShadowOpacity, 
-                        Color = Color.Parse("#2C2F32"), 
-                        Direction = DropShadowDirection
-                    };
 
-                    ((ISetLogicalParent)tooltip).SetParent(this.GetVisualRoot() as Window);
-                    tooltip.Open();
-                    tooltipTargets.Push(tooltip);
+                    ((ISetLogicalParent)popup).SetParent(this.GetVisualRoot() as Window);
+                    targets.Push(popup);
+                    popup.Open();
                 });
             }
         }
 
         private void OnHideTooltip() {
-            lock (tooltipLock) {
+            lock (popupLock) {
                 Dispatcher.UIThread.Invoke(() => {
-                    foreach (var t in tooltipTargets) {
+                    foreach (var t in targets) {
                         ((Popup)t).Close();
-                        //ToolTip.SetTip(t, null);
                     }
-                    tooltipTargets.Clear();
+                    targets.Clear();
                 });
             }
         }
-
-        private void OnMainViewAddTaskButtonClicked(TaskCreationDetails taskDetails) {
-            taskList.Add(new Task() {
-                id = taskCounter++,
-                text = taskDetails.text,
-                user = "User1"
-            });
-            mainView.Refresh(); // refresh task counter
-            taskListView.Refresh(); // refresh task list
-            AppendLog("Added task: " + taskDetails.text);
-        }
-
-        public void ToggleHideCompletedTasks() => taskListView.ToggleHideCompletedTasks();
 
         public void ShowDevTools() => mainView.ShowDeveloperTools();
 
         public void ToggleIsEnabled() => mainView.IsEnabled = !mainView.IsEnabled;
 
         public ReactViewControl.EditCommands EditCommands => mainView.EditCommands;
-
-        private void AppendLog(string log) {
-            Dispatcher.UIThread.Post(() => {
-                var status = this.FindControl<TextBox>("status");
-                status.Text = DateTime.Now + ": " + log + Environment.NewLine + status.Text;
-            });
-        }
-
-        private Resource OnTaskListViewCustomResourceRequested(string resourceKey, params string[] options) {
-            return new Resource(ResourcesManager.GetResource(GetType().Assembly, new[] { "Users", resourceKey + ".png" }));
-        }
         
         private static Rect MeasurePlacementRect(Window window, Visual target, double x, double y) {
             var renderScaling = window.RenderScaling;

@@ -7,13 +7,10 @@ namespace Sample.Avalonia {
 
         protected class ExtendedReactViewFactory : ReactViewFactory {
 
-            public override ResourceUrl DefaultStyleSheet =>
-                new(typeof(ExtendedReactViewFactory).Assembly, "Generated",
-                    Settings.IsLightTheme ? "LightTheme.css" : "DarkTheme.css");
+            public override ResourceUrl DefaultStyleSheet => null;
             
             public override IViewModule[] InitializePlugins() {
-                var viewPlugin = new ViewPlugin();
-                return new IViewModule[] { viewPlugin };
+                return new IViewModule[] { };
             }
 
             public override bool ShowDeveloperTools => false;

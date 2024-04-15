@@ -21,11 +21,6 @@
     <AvaloniaResource Include="App.xaml" />
     <AvaloniaResource Include="MainWindow.xaml" />
   </ItemGroup>
-
-  <ItemGroup>
-    <DefaultStyleSheet Include="Styles\LightTheme.scss" />
-    <DefaultStyleSheet Include="Styles\DarkTheme.scss" />
-  </ItemGroup>
     
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
@@ -51,8 +46,11 @@
     <Content Update="tsconfig.json">
       <Visible>True</Visible>
     </Content>
-    <EmbeddedResource Include="MainView\Tasks.png" />
-    <EmbeddedResource Include="Users\User1.png" />
-    <EmbeddedResource Include="Users\User2.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="ViewPlugin\ViewPlugin.ts" />
+    <UpToDateCheckInput Remove="TaskListView\TaskListView.tsx" />
+    <UpToDateCheckInput Remove="TaskListView\TaskListView.scss" />
   </ItemGroup>
 </Project>
