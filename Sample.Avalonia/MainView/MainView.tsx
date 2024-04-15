@@ -2,6 +2,7 @@
 
 export interface IMainViewProperties {
     onBtnClick(): void;
+    onFlyoutClick(): void;
 }
 
 export default class MainView extends React.Component<IMainViewProperties> {
@@ -14,10 +15,17 @@ export default class MainView extends React.Component<IMainViewProperties> {
         this.props.onBtnClick();
     };
 
+    private onFlyoutClick = () => {
+        this.props.onFlyoutClick();
+    };
+
     public render(): JSX.Element {
         return (
             <div className="wrapper">
                 <button onClick={this.onBtnClick}>Create Popup with Input</button>
+                <br/>
+                <br/>
+                <button onClick={this.onFlyoutClick}>Create Flyout with Input</button>
             </div>
         );
     }

@@ -24,12 +24,15 @@ namespace Sample.Avalonia {
             mainView = new MainView();
             mainView.Focusable = true;
             mainView.OnBtnClick += OnShowPopup;
-
+            mainView.OnFlyoutClick += OnShowFlyout;
             Content = mainView;
         }
 
         private readonly object popupLock = new();
         private readonly ConcurrentStack<Control> targets = new();
+        
+        private readonly object flyoutLock = new();
+        private readonly ConcurrentStack<Flyout> targetFlyouts = new();
         
         private void OnShowPopup() {
             lock (popupLock) {
@@ -37,7 +40,7 @@ namespace Sample.Avalonia {
 
                     var popupView = new PopupView();
                     popupView.GetPopupData += () => "Hello, this is a popup, write some things:";
-                    popupView.OnBtnClick += OnHideTooltip;
+                    popupView.OnBtnClick += OnHidePopup;
                     popupView.RefreshPopup();
                     popupView.Width = 200;
                     popupView.Height = 200;
@@ -71,7 +74,7 @@ namespace Sample.Avalonia {
             }
         }
 
-        private void OnHideTooltip() {
+        private void OnHidePopup() {
             lock (popupLock) {
                 Dispatcher.UIThread.Invoke(() => {
                     foreach (var t in targets) {
@@ -82,11 +85,46 @@ namespace Sample.Avalonia {
             }
         }
 
+        private void OnShowFlyout() {
+            lock (flyoutLock) {
+                Dispatcher.UIThread.Invoke(() => {
+
+                    var popupView = new PopupView();
+                    popupView.GetPopupData += () => "Hello, this is a flyout, write some things:";
+                    popupView.OnBtnClick += () => {};
+                    popupView.RefreshPopup();
+                    popupView.Width = 200;
+                    popupView.Height = 200;
+                    
+                    var flyout = new Flyout {
+                        Content = new ContentControl { Content = popupView },
+                        HorizontalOffset = 100,
+                        Placement = PlacementMode.AnchorAndGravity,
+                        PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY,
+                        PlacementGravity = PopupGravity.BottomRight,
+                        PlacementAnchor = PopupAnchor.TopLeft,
+                        VerticalOffset = 100,
+                        ShowMode = FlyoutShowMode.Transient
+                    };
+                    
+                    mainView.Focusable = true;
+                    mainView.IsEnabled = true;
+
+
+                    var content = (ContentControl)flyout.Content;
+                    content.Margin = new Thickness(MarginThickness);
+                    content.Padding = new Thickness(Padding);
+                    content.BorderThickness = new Thickness(BorderThickness);
+                    content.BorderBrush = new SolidColorBrush(Colors.Black);
+
+
+                    targetFlyouts.Push(flyout);
+                    flyout.ShowAt(mainView);
+                });
+            }
+        }
+
         public void ShowDevTools() => mainView.ShowDeveloperTools();
-
-        public void ToggleIsEnabled() => mainView.IsEnabled = !mainView.IsEnabled;
-
-        public ReactViewControl.EditCommands EditCommands => mainView.EditCommands;
         
         private static Rect MeasurePlacementRect(Window window, Visual target, double x, double y) {
             var renderScaling = window.RenderScaling;
