@@ -12,20 +12,13 @@ using Avalonia.VisualTree;
 namespace Sample.Avalonia {
 
     internal class TabView : ContentControl {
-        private const int BorderThickness = 1;
-        private const int CornerRadiusOSX = 9;
-        private const int CornerRadiusWindows = 8;
-        private const int DropShadowBlurRadius = 20;
-        private const int DropShadowDepth = 20;
-        private const int DropShadowDirection = 5;
-        private const double DropShadowOpacity = 0.2;
+        private new const int BorderThickness = 1;
         private const int MarginThickness = 10;
-        private const int Padding = 2;
+        private new const int Padding = 2;
         
         protected override Type StyleKeyOverride => typeof(ContentControl);
 
-        private MainView mainView;
-        private int taskCounter;
+        private readonly MainView mainView;
 
         public TabView(int id) {
             mainView = new MainView();
