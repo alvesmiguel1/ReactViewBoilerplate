@@ -1,0 +1,20 @@
+{
+  "Tooltip": [
+    "Generated/chunk_90720148271e22d9457d.js",
+    "Generated/Tooltip.js"
+  ],
+  "TaskListView": [
+    "Generated/chunk_90720148271e22d9457d.js",
+    "Generated/TaskListView.css",
+    "Generated/TaskListView.js"
+  ],
+  "MainView": [
+    "Generated/chunk_90720148271e22d9457d.js",
+    "Generated/MainView.css",
+    "Generated/MainView.js"
+  ],
+  "ViewPlugin": [
+    "Generated/chunk_90720148271e22d9457d.js",
+    "Generated/ViewPlugin.js"
+  ]
+}

@@ -1,0 +1,38 @@
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ../packages/viewpacker/1.2.0/tools/node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[0].use[1]!../packages/viewpacker/1.2.0/tools/node_modules/resolve-url-loader/index.js!../packages/viewpacker/1.2.0/tools/node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[0].use[3]!./TaskListView/TaskListView.scss ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************/
+body {
+  background: none;
+}
+
+.list-item {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  border: 1px solid lightgray;
+  margin: 10px 0px;
+}
+.list-item .content {
+  display: inline-block;
+}
+.list-item .check {
+  display: inline-block;
+  margin-right: 15px;
+  vertical-align: super;
+  height: 20px;
+  width: 20px;
+}
+.list-item .text {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+.list-item .user {
+  font-size: smaller;
+  font-style: italic;
+}
+.list-item .user-pic {
+  height: 12px;
+  vertical-align: baseline;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiR2VuZXJhdGVkL1Rhc2tMaXN0Vmlldy5jc3MiLCJtYXBwaW5ncyI6Ijs7O0FBQUE7RUFDSTtBQUNKOztBQUVBO0VBQ0k7RUFDQTtFQUNBO0VBQ0E7RUFDQTtBQUNKO0FBQ0k7RUFDSTtBQUNSO0FBRUk7RUFDSTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0FBQVI7QUFHSTtFQUNJO0VBQ0E7QUFEUjtBQUlJO0VBQ0k7RUFDQTtBQUZSO0FBS0k7RUFDSTtFQUNBO0FBSFIsQyIsInNvdXJjZXMiOlsid2VicGFjazovL1ZpZXdzLy4vVGFza0xpc3RWaWV3L1Rhc2tMaXN0Vmlldy5zY3NzIl0sInNvdXJjZXNDb250ZW50IjpbImJvZHkge1xuICAgIGJhY2tncm91bmQ6IG5vbmU7XG59XG5cbi5saXN0LWl0ZW0ge1xuICAgIHBhZGRpbmc6IDEwcHg7XG4gICAgYmFja2dyb3VuZDogcmdiYSgyNTUsMjU1LDI1NSwwLjYpO1xuICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7XG4gICAgYm9yZGVyOiAxcHggc29saWQgbGlnaHRncmF5O1xuICAgIG1hcmdpbjogMTBweCAwcHg7XG5cbiAgICAuY29udGVudCB7XG4gICAgICAgIGRpc3BsYXk6IGlubGluZS1ibG9jaztcbiAgICB9XG5cbiAgICAuY2hlY2sge1xuICAgICAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gICAgICAgIG1hcmdpbi1yaWdodDogMTVweDtcbiAgICAgICAgdmVydGljYWwtYWxpZ246IHN1cGVyO1xuICAgICAgICBoZWlnaHQ6IDIwcHg7XG4gICAgICAgIHdpZHRoOiAyMHB4O1xuICAgIH1cblxuICAgIC50ZXh0IHtcbiAgICAgICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgICAgICBtYXJnaW4tYm90dG9tOiA1cHg7XG4gICAgfVxuXG4gICAgLnVzZXIge1xuICAgICAgICBmb250LXNpemU6IHNtYWxsZXI7XG4gICAgICAgIGZvbnQtc3R5bGU6IGl0YWxpYztcbiAgICB9XG5cbiAgICAudXNlci1waWMge1xuICAgICAgICBoZWlnaHQ6IDEycHg7XG4gICAgICAgIHZlcnRpY2FsLWFsaWduOiBiYXNlbGluZTtcbiAgICB9XG59Il0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9*/
