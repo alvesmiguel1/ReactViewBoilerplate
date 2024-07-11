@@ -11,10 +11,7 @@
 
   <ItemGroup>
     <None Remove="App.xaml" />
-    <None Remove="MainView\Tasks.png" />
     <None Remove="MainWindow.xaml" />
-    <None Remove="Users\User1.png" />
-    <None Remove="Users\User2.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,24 +20,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DefaultStyleSheet Include="Styles\LightTheme.scss" />
-    <DefaultStyleSheet Include="Styles\DarkTheme.scss" />
-  </ItemGroup>
-    
-  <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Diagnostics" />
     <PackageReference Include="Avalonia.ReactiveUI" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="ReactViewControl-Avalonia$(ReactViewPackageSuffix)" />
-    <PackageReference Include="ViewGenerator">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="ViewGeneratorCore">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+<!--    <PackageReference Include="ViewGenerator">-->
+<!--      <PrivateAssets>all</PrivateAssets>-->
+<!--      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+<!--    </PackageReference>-->
+<!--    <PackageReference Include="ViewGeneratorCore">-->
+<!--      <PrivateAssets>all</PrivateAssets>-->
+<!--      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+<!--    </PackageReference>-->
     <PackageReference Include="WebViewControl-Avalonia$(WebViewPackageSuffix)" />
   </ItemGroup>
 
@@ -51,8 +43,11 @@
     <Content Update="tsconfig.json">
       <Visible>True</Visible>
     </Content>
-    <EmbeddedResource Include="MainView\Tasks.png" />
-    <EmbeddedResource Include="Users\User1.png" />
-    <EmbeddedResource Include="Users\User2.png" />
   </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="**\*.js" Exclude="node_modules\**\*.js;@(EmbeddedResource)" />
+        <EmbeddedResource Include="**\*.css" Exclude="node_modules\**\*.css;**\*.min.css;@(EmbeddedResource)" />
+        <EmbeddedResource Include="**\*.entry" Exclude="@(EmbeddedResource)" />
+    </ItemGroup>
 </Project>
