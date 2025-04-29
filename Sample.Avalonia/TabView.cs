@@ -12,9 +12,6 @@ using Avalonia.VisualTree;
 namespace Sample.Avalonia {
 
     internal class TabView : ContentControl {
-        private new const int BorderThickness = 1;
-        private const int MarginThickness = 10;
-        private new const int Padding = 2;
         
         protected override Type StyleKeyOverride => typeof(ContentControl);
 
@@ -24,127 +21,23 @@ namespace Sample.Avalonia {
             mainView = new MainView();
             mainView.Focusable = true;
             mainView.OnBtnClick += OnShowPopup;
-            mainView.OnFlyoutClick += OnShowFlyout;
             Content = mainView;
         }
 
         private readonly object popupLock = new();
-        private readonly ConcurrentStack<Control> targets = new();
-        
-        private readonly object flyoutLock = new();
-        private readonly ConcurrentStack<Flyout> targetFlyouts = new();
         
         private void OnShowPopup() {
             lock (popupLock) {
                 Dispatcher.UIThread.Invoke(() => {
-
-                    var popupView = new PopupView();
-                    popupView.GetPopupData += () => "Hello, this is a popup, write some things:";
-                    popupView.OnBtnClick += OnHidePopup;
-                    popupView.RefreshPopup();
-                    popupView.Width = 200;
-                    popupView.Height = 200;
-                    
-                    var popup = new Popup {
-                        Child = new ContentControl { Content = popupView },
+                    var window = new MainWindow {
                         Focusable = true,
-                        IsEnabled = true,
-                        HorizontalOffset = 100,
-                        Placement = PlacementMode.AnchorAndGravity,
-                        PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY,
-                        PlacementGravity = PopupGravity.BottomRight,
-                        PlacementAnchor = PopupAnchor.TopLeft,
-                        PlacementRect = MeasurePlacementRect(this.GetVisualRoot() as Window, this, 100, 100),
-                        PlacementTarget = this,
-                        VerticalOffset = 100,
-                        WindowManagerAddShadowHint = false
+                        Position = new PixelPoint(100, 100)
                     };
-
-
-                    var content = (ContentControl)popup.Child;
-                    content.Margin = new Thickness(MarginThickness);
-                    content.Padding = new Thickness(Padding);
-                    content.BorderThickness = new Thickness(BorderThickness);
-                    content.BorderBrush = new SolidColorBrush(Colors.Black);
-
-                    ((ISetLogicalParent)popup).SetParent(this.GetVisualRoot() as Window);
-                    targets.Push(popup);
-                    popup.Open();
-                });
-            }
-        }
-
-        private void OnHidePopup() {
-            lock (popupLock) {
-                Dispatcher.UIThread.Invoke(() => {
-                    foreach (var t in targets) {
-                        ((Popup)t).Close();
-                    }
-                    targets.Clear();
-                });
-            }
-        }
-
-        private void OnShowFlyout() {
-            lock (flyoutLock) {
-                Dispatcher.UIThread.Invoke(() => {
-
-                    var popupView = new PopupView();
-                    popupView.GetPopupData += () => "Hello, this is a flyout, write some things:";
-                    popupView.OnBtnClick += () => {};
-                    popupView.RefreshPopup();
-                    popupView.Width = 200;
-                    popupView.Height = 200;
-                    
-                    var flyout = new Flyout {
-                        Content = new ContentControl { Content = popupView },
-                        HorizontalOffset = 100,
-                        Placement = PlacementMode.AnchorAndGravity,
-                        PlacementConstraintAdjustment = PopupPositionerConstraintAdjustment.FlipX | PopupPositionerConstraintAdjustment.FlipY,
-                        PlacementGravity = PopupGravity.BottomRight,
-                        PlacementAnchor = PopupAnchor.TopLeft,
-                        VerticalOffset = 100,
-                        ShowMode = FlyoutShowMode.Transient
-                    };
-                    
-                    mainView.Focusable = true;
-                    mainView.IsEnabled = true;
-
-
-                    var content = (ContentControl)flyout.Content;
-                    content.Margin = new Thickness(MarginThickness);
-                    content.Padding = new Thickness(Padding);
-                    content.BorderThickness = new Thickness(BorderThickness);
-                    content.BorderBrush = new SolidColorBrush(Colors.Black);
-
-
-                    targetFlyouts.Push(flyout);
-                    flyout.ShowAt(mainView);
+                    window.Show();
                 });
             }
         }
 
         public void ShowDevTools() => mainView.ShowDeveloperTools();
-        
-        private static Rect MeasurePlacementRect(Window window, Visual target, double x, double y) {
-            var renderScaling = window.RenderScaling;
-                    
-            // Calculate scaled window bounds
-            var scaledWindowBounds = new PixelRect(
-                x: (int)(window.Position.X * renderScaling),
-                y: (int)(window.Position.Y * renderScaling),
-                width: (int)(window.Bounds.Width * renderScaling),
-                height: (int)(window.Bounds.Height * renderScaling)
-            );
-                    
-            var controlPosition = target.PointToScreen(new Point(target.Bounds.Position.X, target.Bounds.Position.Y));
-                    
-            // Calculate the scaled position of the cursor within the browser
-            var scaledCursorX = (int)(x * renderScaling);
-            var scaledCursorY = (int)(y * renderScaling);
-                    
-            var activeScreen = window.Screens.ScreenFromBounds(new PixelRect(controlPosition.X + scaledCursorX, controlPosition.Y + scaledCursorY, 1, 1));
-            return activeScreen == null ? default : scaledWindowBounds.Intersect(activeScreen.Bounds).ToRectWithDpi(renderScaling);
-        }
     }
 }

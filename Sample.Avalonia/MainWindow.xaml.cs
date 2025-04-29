@@ -17,6 +17,7 @@ namespace Sample.Avalonia {
 
         public MainWindow() {
             AvaloniaXamlLoader.Load(this);
+            Focusable = true;
 
             tabs = this.FindControl<TabControl>("tabs");
 
